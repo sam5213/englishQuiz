@@ -1,8 +1,9 @@
 {
-  "name": "english-quiz-github-pages",
+  "name": "englishQuiz",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "/srs/main.tsx"
   "homepage": "https://sam5213.github.io/englishQuiz/",
   "scripts": {
     "dev": "vite",
