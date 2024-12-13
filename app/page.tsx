@@ -193,6 +193,7 @@ export default function EnglishQuiz() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
           },
           body: JSON.stringify({
             type: 'booking',
@@ -201,7 +202,8 @@ export default function EnglishQuiz() {
         });
 
         if (!response.ok) {
-          throw new Error('Failed to book lesson');
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Failed to book lesson');
         }
 
         setShowBooking(false);
@@ -223,6 +225,7 @@ export default function EnglishQuiz() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({
           type: 'quiz_results',
@@ -231,10 +234,12 @@ export default function EnglishQuiz() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to send quiz results');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to send quiz results');
       }
     } catch (error) {
       console.error('Error sending quiz results:', error);
+      // Optionally show an error message to the user
     }
   }
 
