@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, ArrowRight, Sparkles, Star } from 'lucide-react'
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://082d-178-176-83-2.ngrok-free.app';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
 
 const questions = [
   {
@@ -87,6 +87,11 @@ export default function EnglishQuiz() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined)
 
+  useEffect(() => {
+    const userLang = navigator.language || navigator.userLanguage;
+    setLanguage(userLang.startsWith('ru') ? 'ru' : 'en');
+  }, []);
+
   const startQuiz = () => {
     setQuizStarted(true)
   }
@@ -145,21 +150,33 @@ export default function EnglishQuiz() {
   const analyzeResults = () => {
     let recommendation = ""
     if (results.purpose?.includes("For work")) {
-      recommendation += "We recommend our Business English course. "
+      recommendation += language === 'en' 
+      ? "We recommend our Business English course. "
+      : "Мы рекомендуем наш курс делового английского. ";
     } else if (results.purpose?.includes("For travel")) {
-      recommendation += "Our Conversational English course would be perfect for you. "
+      recommendation += language === 'en'
+      ? "Our Conversational English course would be perfect for you. "
+      : "Наш курс разговорного английского идеально подойдет вам. ";
     }
 
     if (results.level?.includes("Beginner") || results.level?.includes("Intermediate")) {
-      recommendation += "We'll focus on building your foundational skills. "
+      recommendation += language === 'en'
+      ? "We'll focus on building your foundational skills. "
+      : "Мы сосредоточимся на развитии ваших базовых навыков. ";
     } else {
-      recommendation += "We'll help you refine your advanced skills. "
+      recommendation += language === 'en'
+      ? "We'll help you refine your advanced skills. "
+      : "Мы поможем вам усовершенствовать ваши продвинутые навыки. ";
     }
 
     if (results.challenge?.includes("Grammar")) {
-      recommendation += "Our lessons will have a strong focus on grammar exercises. "
+      recommendation += language === 'en'
+      ? "Our lessons will have a strong focus on grammar exercises. "
+      : "Наши уроки будут иметь сильный акцент на грамматических упражнениях. ";
     } else if (results.challenge?.includes("Pronunciation")) {
-      recommendation += "We'll incorporate plenty of pronunciation practice. "
+      recommendation += language === 'en'
+      ? "We'll incorporate plenty of pronunciation practice. "
+      : "Мы включим много практики произношения. ";
     }
 
     return recommendation
@@ -171,21 +188,28 @@ export default function EnglishQuiz() {
 
   const confirmBooking = async () => {
     if (selectedDate && selectedTime) {
-      console.log(`Booking confirmed for ${selectedDate.toDateString()} at ${selectedTime}`)
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/sendToTelegram`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'booking',
+            message: `New lesson booked for ${selectedDate.toDateString()} at ${selectedTime}`
+          }),
+        });
 
-      await fetch(`${BACKEND_URL}/api/sendToTelegram`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: 'booking',
-          message: `New lesson booked for ${selectedDate.toDateString()} at ${selectedTime}`
-        }),
-      })
+        if (!response.ok) {
+          throw new Error('Failed to book lesson');
+        }
 
-      setShowBooking(false)
-      alert("Your lesson has been booked! Check your Telegram for details.")
+        setShowBooking(false);
+        alert(language === 'en' ? "Your lesson has been booked! Check your Telegram for details." : "Ваш урок забронирован! Проверьте Telegram для получения деталей.");
+      } catch (error) {
+        console.error('Error booking lesson:', error);
+        alert(language === 'en' ? "Failed to book lesson. Please try again." : "Не удалось забронировать урок. Пожалуйста, попробуйте снова.");
+      }
     }
   }
 
@@ -194,16 +218,24 @@ export default function EnglishQuiz() {
       .map(([category, answers]) => `${category}: ${answers.join(', ')}`)
       .join('\n')
 
-    await fetch(`${BACKEND_URL}/api/sendToTelegram`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        type: 'quiz_results',
-        message: `New quiz results:\n${resultSummary}`
-      }),
-    })
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/sendToTelegram`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'quiz_results',
+          message: `New quiz results:\n${resultSummary}`
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send quiz results');
+      }
+    } catch (error) {
+      console.error('Error sending quiz results:', error);
+    }
   }
 
   return (
