@@ -233,25 +233,25 @@ async function sendResultsToAdmin() {
     }
 }
 
-async function compressGif(url) {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    const img = new Image();
-    img.src = URL.createObjectURL(blob);
-    await new Promise(resolve => img.onload = resolve);
+// async function compressGif(url) {
+//     const response = await fetch(url);
+//     const blob = await response.blob();
+//     const img = new Image();
+//     img.src = URL.createObjectURL(blob);
+//     await new Promise(resolve => img.onload = resolve);
 
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = img.width;
-    canvas.height = img.height;
-    ctx.drawImage(img, 0, 0, img.width, img.height);
+//     const canvas = document.createElement('canvas');
+//     const ctx = canvas.getContext('2d');
+//     canvas.width = img.width;
+//     canvas.height = img.height;
+//     ctx.drawImage(img, 0, 0, img.width, img.height);
 
-    return new Promise(resolve => {
-        canvas.toBlob(resolve, 'image/gif', 0.5);  // Сжимаем до 50% качества
-    });
-}
+//     return new Promise(resolve => {
+//         canvas.toBlob(resolve, 'image/gif', 0.5);  // Сжимаем до 50% качества
+//     });
+// }
 
-async function renderQuiz() {
+function renderQuiz() {
     const card = document.getElementById('card');
     card.innerHTML = '';
 
@@ -274,7 +274,7 @@ async function renderQuiz() {
         `;
     } else if (quizStarted && !showResult) {
         const question = questions[currentQuestion];
-        const compressedGifs = await Promise.all(question.answers.map(answer => compressGif(answer.gif)));
+        // const compressedGifs = await Promise.all(question.answers.map(answer => compressGif(answer.gif)));
         
         card.innerHTML = `
             <div>
@@ -300,7 +300,7 @@ async function renderQuiz() {
                             }"
                         >
                             <div class="relative aspect-video">
-                                <img src="${URL.createObjectURL(compressedGifs[index])}" alt="${answer.en}" style="width: 100%; height: 100%; object-fit: cover;">
+                                <img src="${answer.gif}" alt="${answer.en}" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
                             <div class="p-4 bg-white">
                                 <p class="text-center font-semibold">
