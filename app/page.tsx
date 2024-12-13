@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, ArrowRight, Sparkles, Star } from 'lucide-react'
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://082d-178-176-83-2.ngrok-free.app';
+
 const questions = [
   {
     question: "What's your primary goal for learning English?",
@@ -171,7 +173,7 @@ export default function EnglishQuiz() {
     if (selectedDate && selectedTime) {
       console.log(`Booking confirmed for ${selectedDate.toDateString()} at ${selectedTime}`)
 
-      await fetch('https://082d-178-176-83-2.ngrok-free.app/post', {
+      await fetch(`${BACKEND_URL}/api/sendToTelegram`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -192,7 +194,7 @@ export default function EnglishQuiz() {
       .map(([category, answers]) => `${category}: ${answers.join(', ')}`)
       .join('\n')
 
-    await fetch('https://082d-178-176-83-2.ngrok-free.app/post', {
+    await fetch(`${BACKEND_URL}/api/sendToTelegram`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
