@@ -123,14 +123,10 @@ function EnglishQuiz() {
 
   const confirmBooking = async () => {
     if (selectedDate && selectedTime) {
-      console.log(`Booking confirmed for ${selectedDate.toDateString()} at ${selectedTime}`)
-
-      // Here we would typically send this data to a backend
-      // For GitHub Pages, we'll use a mock API call
-      await mockSendToTelegram('booking', `New lesson booked for ${selectedDate.toDateString()} at ${selectedTime}`)
-
+      console.log(`Mock: Booking confirmed for ${selectedDate.toDateString()} at ${selectedTime}`)
+      // The actual booking confirmation would be handled by the backend
       setShowBooking(false)
-      alert("Your lesson has been booked! Check your Telegram for details.")
+      alert("Your lesson has been booked! You will receive a confirmation soon.")
     }
   }
 
@@ -139,16 +135,10 @@ function EnglishQuiz() {
       .map(([category, answers]) => `${category}: ${answers.join(', ')}`)
       .join('\n')
 
-    // Here we would typically send this data to a backend
-    // For GitHub Pages, we'll use a mock API call
-    await mockSendToTelegram('quiz_results', `New quiz results:\n${resultSummary}`)
+    console.log('Mock: Sending quiz results to admin:', resultSummary)
+    // The actual sending would be handled by the backend
   }
 
-  // Mock function to simulate sending messages to Telegram
-  const mockSendToTelegram = async (type: string, message: string) => {
-    console.log(`Mock Telegram message (${type}):`, message)
-    // In a real scenario, you would send this data to a serverless function or external API
-  }
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center p-4">
