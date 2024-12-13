@@ -10,6 +10,12 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  base: '/english-quiz-github-pages/'
+  base: '/english-quiz-github-pages/',
+  build: {
+    outDir: 'dist',
+    rollupOptions: {
+      external: [/^src\/server\/.*/],
+    },
+  },
 })
 
