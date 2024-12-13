@@ -1,4 +1,4 @@
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = 'https://082d-178-176-83-2.ngrok-free.app';
 
 const questions = [
     {
