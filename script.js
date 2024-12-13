@@ -169,7 +169,13 @@ function handleBookLesson() {
 }
 
 async function confirmBooking() {
-    if (selectedDate && selectedTime) {
+    const dateInput = document.getElementById('date');
+    const timeInput = document.getElementById('time');
+    
+    if (dateInput && timeInput && dateInput.value && timeInput.value) {
+        selectedDate = new Date(dateInput.value);
+        selectedTime = timeInput.value;
+        
         try {
             const response = await fetch(`${BACKEND_URL}/api/sendToTelegram`, {
                 method: 'POST',
@@ -195,6 +201,8 @@ async function confirmBooking() {
             alert(language === 'en' ? "Failed to book lesson. Please try again." : "Не удалось забронировать урок. Пожалуйста, попробуйте снова.");
         }
         renderQuiz();
+    } else {
+        alert(language === 'en' ? "Please select both date and time." : "Пожалуйста, выберите дату и время.");
     }
 }
 
@@ -225,7 +233,25 @@ async function sendResultsToAdmin() {
     }
 }
 
-function renderQuiz() {
+async function compressGif(url) {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const img = new Image();
+    img.src = URL.createObjectURL(blob);
+    await new Promise(resolve => img.onload = resolve);
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+
+    return new Promise(resolve => {
+        canvas.toBlob(resolve, 'image/gif', 0.5);  // Сжимаем до 50% качества
+    });
+}
+
+async function renderQuiz() {
     const card = document.getElementById('card');
     card.innerHTML = '';
 
@@ -248,6 +274,8 @@ function renderQuiz() {
         `;
     } else if (quizStarted && !showResult) {
         const question = questions[currentQuestion];
+        const compressedGifs = await Promise.all(question.answers.map(answer => compressGif(answer.gif)));
+        
         card.innerHTML = `
             <div>
                 <div class="flex justify-between items-center mb-8">
@@ -272,7 +300,7 @@ function renderQuiz() {
                             }"
                         >
                             <div class="relative aspect-video">
-                                <img src="${answer.gif}" alt="${answer.en}" style="width: 100%; height: 100%; object-fit: cover;">
+                                <img src="${URL.createObjectURL(compressedGifs[index])}" alt="${answer.en}" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
                             <div class="p-4 bg-white">
                                 <p class="text-center font-semibold">
