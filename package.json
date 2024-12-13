@@ -3,10 +3,10 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "src/main.tsx"
+  "main": "src/main.tsx",
   "homepage": "https://sam5213.github.io/englishQuiz/",
   "scripts": {
-    "start": "node src/main.tsx"
+    "start": "node src/main.tsx",
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
