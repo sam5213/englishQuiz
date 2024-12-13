@@ -11,10 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    // ... (keep existing dependencies)
-  },
-  "devDependencies": {
-    // ... (keep existing devDependencies)
+    "express": "^4.17.1"
   }
 }
 
