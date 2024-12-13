@@ -171,7 +171,7 @@ export default function EnglishQuiz() {
     if (selectedDate && selectedTime) {
       console.log(`Booking confirmed for ${selectedDate.toDateString()} at ${selectedTime}`)
 
-      await fetch('https://082d-178-176-83-2.ngrok-free.app/post', {
+      await fetch('/api/sendToTelegram', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -192,7 +192,7 @@ export default function EnglishQuiz() {
       .map(([category, answers]) => `${category}: ${answers.join(', ')}`)
       .join('\n')
 
-    await fetch('https://082d-178-176-83-2.ngrok-free.app/post', {
+    await fetch('/api/sendToTelegram', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -396,5 +396,4 @@ export default function EnglishQuiz() {
     </div>
   )
 }
-
 
