@@ -1,0 +1,20 @@
+{
+  "name": "english-quiz-github-pages",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "homepage": "https://<your-github-username>.github.io/english-quiz-github-pages/",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    // ... (keep existing dependencies)
+  },
+  "devDependencies": {
+    // ... (keep existing devDependencies)
+  }
+}
+
