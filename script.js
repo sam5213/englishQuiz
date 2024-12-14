@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://082d-178-176-83-2.ngrok-free.app';
+const BACKEND_URL = 'https://92c2-2a03-d000-8428-c2a8-b53e-b037-ba4-49af.ngrok-free.app';
 
 const questions = [
     {
@@ -233,25 +233,25 @@ async function sendResultsToAdmin() {
     }
 }
 
-// async function compressGif(url) {
-//     const response = await fetch(url);
-//     const blob = await response.blob();
-//     const img = new Image();
-//     img.src = URL.createObjectURL(blob);
-//     await new Promise(resolve => img.onload = resolve);
+async function compressGif(url) {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const img = new Image();
+    img.src = URL.createObjectURL(blob);
+    await new Promise(resolve => img.onload = resolve);
 
-//     const canvas = document.createElement('canvas');
-//     const ctx = canvas.getContext('2d');
-//     canvas.width = img.width;
-//     canvas.height = img.height;
-//     ctx.drawImage(img, 0, 0, img.width, img.height);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0, img.width, img.height);
 
-//     return new Promise(resolve => {
-//         canvas.toBlob(resolve, 'image/gif', 0.5);  // Сжимаем до 50% качества
-//     });
-// }
+    return new Promise(resolve => {
+        canvas.toBlob(resolve, 'image/gif', 0.5);  // Сжимаем до 50% качества
+    });
+}
 
-function renderQuiz() {
+async function renderQuiz() {
     const card = document.getElementById('card');
     card.innerHTML = '';
 
@@ -259,7 +259,7 @@ function renderQuiz() {
         card.innerHTML = `
             <div class="text-center">
                 <div class="mb-8">
-                    <img src="/englishQuiz/english-quiz-hero.svg" alt="English Quiz" width="200" height="200" class="mx-auto">
+                    <img src="/english-quiz-hero.svg" alt="English Quiz" width="200" height="200" class="mx-auto">
                 </div>
                 <h1 class="text-4xl font-bold mb-6 text-primary">English Quiz</h1>
                 <p class="text-gray-600 mb-8">
@@ -274,8 +274,8 @@ function renderQuiz() {
         `;
     } else if (quizStarted && !showResult) {
         const question = questions[currentQuestion];
-        // const compressedGifs = await Promise.all(question.answers.map(answer => compressGif(answer.gif)));
-        
+        const compressedGifs = await Promise.all(question.answers.map(answer => compressGif(answer.gif)));
+
         card.innerHTML = `
             <div>
                 <div class="flex justify-between items-center mb-8">
@@ -300,7 +300,7 @@ function renderQuiz() {
                             }"
                         >
                             <div class="relative aspect-video">
-                                <img src="${answer.gif}" alt="${answer.en}" style="width: 100%; height: 100%; object-fit: cover;">
+                                <img src="${URL.createObjectURL(compressedGifs[index])}" alt="${answer.en}" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
                             <div class="p-4 bg-white">
                                 <p class="text-center font-semibold">
@@ -331,7 +331,7 @@ function renderQuiz() {
         card.innerHTML = `
             <div class="text-center">
                 <div class="mb-8">
-                    <img src="/englishQuiz/english-quiz-result.svg" alt="Quiz Result" width="200" height="200" class="mx-auto">
+                    <img src="/english-quiz-result.svg" alt="Quiz Result" width="200" height="200" class="mx-auto">
                 </div>
                 <h2 class="text-3xl font-bold mb-4 text-primary">
                     ${language === 'en' ? "Your Personalized Learning Plan" : "Ваш персонализированный план обучения"}
@@ -383,7 +383,10 @@ function renderQuiz() {
                         <option value="16:00">16:00</option>
                     </select>
                 </div>
-                <div class="flex justify-end">
+                <div class="flex justify-between">
+                    <button onclick="showBooking = false; renderQuiz();" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                        ${language === 'en' ? "Cancel" : "Отмена"}
+                    </button>
                     <button onclick="confirmBooking()" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded">
                         ${language === 'en' ? "Confirm Booking" : "Подтвердить бронирование"}
                     </button>
