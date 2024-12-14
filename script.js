@@ -63,26 +63,33 @@ const questions = [
     }
 ];
 
-let quizStarted = false;
-let currentQuestion = 0;
-let selectedAnswers = {};
-let results = {};
-let showResult = false;
-let language = 'ru';
-let showBooking = false;
-let selectedDate;
-let selectedTime;
+let state = {
+    quizStarted: false,
+    currentQuestion: 0,
+    selectedAnswers: {},
+    results: {},
+    showResult: false,
+    language: 'ru',
+    showBooking: false,
+    selectedDate: null,
+    selectedTime: null
+};
 
-function startQuiz() {
-    quizStarted = true;
+function setState(newState) {
+    state = { ...state, ...newState };
     renderQuiz();
 }
 
+function startQuiz() {
+    setState({ quizStarted: true });
+}
+
 function handleAnswerSelect(answer) {
-    const currentAnswers = selectedAnswers[questions[currentQuestion].category] || [];
+    const question = questions[state.currentQuestion];
+    const currentAnswers = state.selectedAnswers[question.category] || [];
     let updatedAnswers;
 
-    if (questions[currentQuestion].multiSelect) {
+    if (question.multiSelect) {
         updatedAnswers = currentAnswers.includes(answer)
             ? currentAnswers.filter(a => a !== answer)
             : [...currentAnswers, answer];
@@ -90,72 +97,83 @@ function handleAnswerSelect(answer) {
         updatedAnswers = [answer];
     }
 
-    selectedAnswers[questions[currentQuestion].category] = updatedAnswers;
-    renderQuiz();
+    setState({
+        selectedAnswers: {
+            ...state.selectedAnswers,
+            [question.category]: updatedAnswers
+        }
+    });
 }
 
 function handleNextQuestion() {
-    results[questions[currentQuestion].category] = selectedAnswers[questions[currentQuestion].category] || [];
+    const question = questions[state.currentQuestion];
+    const updatedResults = {
+        ...state.results,
+        [question.category]: state.selectedAnswers[question.category] || []
+    };
 
-    if (currentQuestion < questions.length - 1) {
-        currentQuestion++;
-        selectedAnswers = {};
+    if (state.currentQuestion < questions.length - 1) {
+        setState({
+            currentQuestion: state.currentQuestion + 1,
+            results: updatedResults
+        });
     } else {
-        showResult = true;
+        setState({
+            showResult: true,
+            results: updatedResults
+        });
         sendResultsToAdmin();
     }
-    renderQuiz();
 }
 
 function handlePreviousQuestion() {
-    if (currentQuestion > 0) {
-        currentQuestion--;
+    if (state.currentQuestion > 0) {
+        setState({ currentQuestion: state.currentQuestion - 1 });
     }
-    renderQuiz();
 }
 
 function resetQuiz() {
-    quizStarted = false;
-    currentQuestion = 0;
-    selectedAnswers = {};
-    results = {};
-    showResult = false;
-    renderQuiz();
+    setState({
+        quizStarted: false,
+        currentQuestion: 0,
+        selectedAnswers: {},
+        results: {},
+        showResult: false
+    });
 }
 
 function toggleLanguage() {
-    language = language === 'en' ? 'ru' : 'en';
-    renderQuiz();
+    setState({ language: state.language === 'en' ? 'ru' : 'en' });
 }
 
 function analyzeResults() {
     let recommendation = "";
-    if (results.purpose && results.purpose.includes("For work")) {
-        recommendation += language === 'en' 
+    if (state.results.purpose && state.results.purpose.includes("For work")) {
+        recommendation += state.language === 'en' 
             ? "We recommend our Business English course. "
             : "Мы рекомендуем наш курс делового английского. ";
-    } else if (results.purpose && results.purpose.includes("For travel")) {
-        recommendation += language === 'en'
+    } else if (state.results.purpose && state.results.purpose.includes("For travel")) {
+        recommendation += state.language === 'en'
             ? "Our Conversational English course would be perfect for you. "
             : "Наш курс разговорного английского идеально подойдет вам. ";
     }
 
-    if (results.level && (results.level.includes("Beginner") || results.level.includes("Intermediate"))) {
-        recommendation += language === 'en'
+    if (state.results.level && (state.results.level.includes("Beginner") || state.results.level.includes("Intermediate"))) {
+        recommendation += state.language === 'en'
             ? "We'll focus on building your foundational skills. "
             : "Мы сосредоточимся на развитии ваших базовых навыков. ";
     } else {
-        recommendation += language === 'en'
+        recommendation += state.language === 'en'
             ? "We'll help you refine your advanced skills. "
             : "Мы поможем вам усовершенствовать ваши продвинутые навыки. ";
     }
 
-    if (results.challenge && results.challenge.includes("Grammar")) {
-        recommendation += language === 'en'
+    if (state.results.challenge && state.results.challenge.includes("Grammar")) {
+        recommendation += state.language === 'en'
             ? "Our lessons will have a strong focus on grammar exercises. "
             : "Наши уроки будут иметь сильный акцент на грамматических упражнениях. ";
-    } else if (results.challenge && results.challenge.includes("Pronunciation")) {
-        recommendation += language === 'en'
+    } else if (state.results.challenge && state.results.challenge.includes("Pronunciation")) {
+        recommendation += state.language === 'en'
             ? "We'll incorporate plenty of pronunciation practice. "
             : "Мы включим много практики произношения. ";
     }
@@ -164,8 +182,7 @@ function analyzeResults() {
 }
 
 function handleBookLesson() {
-    showBooking = true;
-    renderQuiz();
+    setState({ showBooking: true });
 }
 
 async function confirmBooking() {
@@ -173,8 +190,10 @@ async function confirmBooking() {
     const timeInput = document.getElementById('time');
     
     if (dateInput && timeInput && dateInput.value && timeInput.value) {
-        selectedDate = new Date(dateInput.value);
-        selectedTime = timeInput.value;
+        setState({
+            selectedDate: new Date(dateInput.value),
+            selectedTime: timeInput.value
+        });
         
         try {
             const response = await fetch(`${BACKEND_URL}/api/sendToTelegram`, {
@@ -185,7 +204,7 @@ async function confirmBooking() {
                 },
                 body: JSON.stringify({
                     type: 'booking',
-                    message: `New lesson booked for ${selectedDate.toDateString()} at ${selectedTime}`
+                    message: `New lesson booked for ${state.selectedDate.toDateString()} at ${state.selectedTime}`
                 }),
             });
 
@@ -194,20 +213,19 @@ async function confirmBooking() {
                 throw new Error(errorData.message || 'Failed to book lesson');
             }
 
-            showBooking = false;
-            alert(language === 'en' ? "Your lesson has been booked! Check your Telegram for details." : "Ваш урок забронирован! Проверьте Telegram для получения деталей.");
+            setState({ showBooking: false });
+            alert(state.language === 'en' ? "Your lesson has been booked! Check your Telegram for details." : "Ваш урок забронирован! Проверьте Telegram для получения деталей.");
         } catch (error) {
             console.error('Error booking lesson:', error);
-            alert(language === 'en' ? "Failed to book lesson. Please try again." : "Не удалось забронировать урок. Пожалуйста, попробуйте снова.");
+            alert(state.language === 'en' ? "Failed to book lesson. Please try again." : "Не удалось забронировать урок. Пожалуйста, попробуйте снова.");
         }
-        renderQuiz();
     } else {
-        alert(language === 'en' ? "Please select both date and time." : "Пожалуйста, выберите дату и время.");
+        alert(state.language === 'en' ? "Please select both date and time." : "Пожалуйста, выберите дату и время.");
     }
 }
 
 async function sendResultsToAdmin() {
-    const resultSummary = Object.entries(results)
+    const resultSummary = Object.entries(state.results)
         .map(([category, answers]) => `${category}: ${answers.join(', ')}`)
         .join('\n');
 
@@ -233,29 +251,11 @@ async function sendResultsToAdmin() {
     }
 }
 
-async function compressGif(url) {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    const img = new Image();
-    img.src = URL.createObjectURL(blob);
-    await new Promise(resolve => img.onload = resolve);
-
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = img.width;
-    canvas.height = img.height;
-    ctx.drawImage(img, 0, 0, img.width, img.height);
-
-    return new Promise(resolve => {
-        canvas.toBlob(resolve, 'image/gif', 0.5);  // Сжимаем до 50% качества
-    });
-}
-
-async function renderQuiz() {
+function renderQuiz() {
     const card = document.getElementById('card');
     card.innerHTML = '';
 
-    if (!quizStarted && !showResult) {
+    if (!state.quizStarted && !state.showResult) {
         card.innerHTML = `
             <div class="text-center">
                 <div class="mb-8">
@@ -263,48 +263,46 @@ async function renderQuiz() {
                 </div>
                 <h1 class="text-4xl font-bold mb-6 text-primary">English Quiz</h1>
                 <p class="text-gray-600 mb-8">
-                    ${language === 'en'
+                    ${state.language === 'en'
                         ? "Test your English skills and get a personalized learning plan"
                         : "Проверьте свой английский и получите персонализированный план обучения"}
                 </p>
                 <button onclick="startQuiz()" class="w-full bg-primary hover:bg-primary-dark text-white rounded-full py-6 text-xl font-semibold transition-all duration-300">
-                    ${language === 'en' ? "Start Quiz" : "Начать тест"}
+                    ${state.language === 'en' ? "Start Quiz" : "Начать тест"}
                 </button>
             </div>
         `;
-    } else if (quizStarted && !showResult) {
-        const question = questions[currentQuestion];
-        const compressedGifs = await Promise.all(question.answers.map(answer => compressGif(answer.gif)));
-
+    } else if (state.quizStarted && !state.showResult) {
+        const question = questions[state.currentQuestion];
         card.innerHTML = `
             <div>
                 <div class="flex justify-between items-center mb-8">
                     <span class="text-sm text-gray-500">
-                        ${language === 'en' ? "Question" : "Вопрос"} ${currentQuestion + 1}/${questions.length}
+                        ${state.language === 'en' ? "Question" : "Вопрос"} ${state.currentQuestion + 1}/${questions.length}
                     </span>
                     <button onclick="toggleLanguage()" class="text-primary">
-                        ${language === 'en' ? "РУС" : "ENG"}
+                        ${state.language === 'en' ? "РУС" : "ENG"}
                     </button>
                 </div>
                 <h2 class="text-2xl font-bold mb-6 text-primary">
-                    ${language === 'en' ? question.question : question.questionRu}
+                    ${state.language === 'en' ? question.question : question.questionRu}
                 </h2>
                 <div class="grid grid-cols-2 gap-4">
                     ${question.answers.map((answer, index) => `
                         <div 
                             onclick="handleAnswerSelect('${answer.en}')"
                             class="cursor-pointer rounded-xl overflow-hidden shadow-md ${
-                                selectedAnswers[question.category]?.includes(answer.en)
+                                state.selectedAnswers[question.category]?.includes(answer.en)
                                     ? 'ring-4 ring-primary'
-                                    : ''
+                                    :''
                             }"
                         >
                             <div class="relative aspect-video">
-                                <img src="${URL.createObjectURL(compressedGifs[index])}" alt="${answer.en}" style="width: 100%; height: 100%; object-fit: cover;">
+                                <img src="${answer.gif}" alt="${answer.en}" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
                             <div class="p-4 bg-white">
                                 <p class="text-center font-semibold">
-                                    ${language === 'en' ? answer.en : answer.ru}
+                                    ${state.language === 'en' ? answer.en : answer.ru}
                                 </p>
                             </div>
                         </div>
@@ -313,28 +311,28 @@ async function renderQuiz() {
                 <div class="flex justify-between pt-6">
                     <button 
                         onclick="handlePreviousQuestion()"
-                        ${currentQuestion === 0 ? 'disabled' : ''}
+                        ${state.currentQuestion === 0 ? 'disabled' : ''}
                         class="text-primary"
                     >
-                        ${language === 'en' ? "Previous" : "Назад"}
+                        ${state.language === 'en' ? "Previous" : "Назад"}
                     </button>
                     <button 
                         onclick="handleNextQuestion()"
                         class="bg-primary hover:bg-primary-dark text-white"
                     >
-                        ${language === 'en' ? "Next" : "Далее"}
+                        ${state.language === 'en' ? "Next" : "Далее"}
                     </button>
                 </div>
             </div>
         `;
-    } else if (showResult) {
+    } else if (state.showResult) {
         card.innerHTML = `
             <div class="text-center">
                 <div class="mb-8">
                     <img src="/english-quiz-result.svg" alt="Quiz Result" width="200" height="200" class="mx-auto">
                 </div>
                 <h2 class="text-3xl font-bold mb-4 text-primary">
-                    ${language === 'en' ? "Your Personalized Learning Plan" : "Ваш персонализированный план обучения"}
+                    ${state.language === 'en' ? "Your Personalized Learning Plan" : "Ваш персонализированный план обучения"}
                 </h2>
                 <p class="text-xl mb-6 text-gray-600">
                     ${analyzeResults()}
@@ -343,43 +341,38 @@ async function renderQuiz() {
                     onclick="handleBookLesson()"
                     class="w-full bg-primary hover:bg-primary-dark text-white rounded-full py-4 text-xl font-semibold transition-all duration-300 mb-4"
                 >
-                    ${language === 'en' ? "Book Your Free Lesson Now" : "Забронировать бесплатный урок"}
+                    ${state.language === 'en' ? "Book Your Free Lesson Now" : "Забронировать бесплатный урок"}
                 </button>
                 <button
                     onclick="resetQuiz()"
                     class="w-full bg-gray-200 text-gray-800 hover:bg-gray-300 rounded-full py-4 text-xl font-semibold transition-all duration-300"
                 >
-                    ${language === 'en' ? "Retake Quiz" : "Пройти тест заново"}
+                    ${state.language === 'en' ? "Retake Quiz" : "Пройти тест заново"}
                 </button>
             </div>
         `;
     }
 
-    if (showBooking) {
-        const existingDialog = document.querySelector('.booking-dialog');
-        if (existingDialog) {
-            existingDialog.remove();
-        }
-
+    if (state.showBooking) {
         const bookingDialog = document.createElement('div');
-        bookingDialog.className = 'booking-dialog fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center';
+        bookingDialog.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center';
         bookingDialog.innerHTML = `
             <div class="bg-white p-8 rounded-lg max-w-md w-full">
                 <h2 class="text-2xl font-bold mb-4">
-                    ${language === 'en' ? "Book Your Free Lesson" : "Забронировать бесплатный урок"}
+                    ${state.language === 'en' ? "Book Your Free Lesson" : "Забронировать бесплатный урок"}
                 </h2>
                 <p class="mb-4">
-                    ${language === 'en' ? "Choose a date and time for your free English lesson." : "Выберите дату и время для вашего бесплатного урока английского языка."}
+                    ${state.language === 'en' ? "Choose a date and time for your free English lesson." : "Выберите дату и время для вашего бесплатного урока английского языка."}
                 </p>
                 <div class="mb-4">
                     <label for="date" class="block text-sm font-medium text-gray-700">
-                        ${language === 'en' ? "Date" : "Дата"}
+                        ${state.language === 'en' ? "Date" : "Дата"}
                     </label>
                     <input type="date" id="date" name="date" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
                 </div>
                 <div class="mb-4">
                     <label for="time" class="block text-sm font-medium text-gray-700">
-                        ${language === 'en' ? "Time" : "Время"}
+                        ${state.language === 'en' ? "Time" : "Время"}
                     </label>
                     <select id="time" name="time" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
                         <option value="09:00">09:00</option>
@@ -389,30 +382,27 @@ async function renderQuiz() {
                     </select>
                 </div>
                 <div class="flex justify-between">
-                    <button onclick="closeBookingDialog()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
-                        ${language === 'en' ? "Cancel" : "Отмена"}
+                    <button onclick="setState({ showBooking: false })" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                        ${state.language === 'en' ? "Cancel" : "Отмена"}
                     </button>
                     <button onclick="confirmBooking()" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded">
-                        ${language === 'en' ? "Confirm Booking" : "Подтвердить бронирование"}
+                        ${state.language === 'en' ? "Confirm Booking" : "Подтвердить бронирование"}
                     </button>
                 </div>
             </div>
         `;
         document.body.appendChild(bookingDialog);
-    }
-}
-
-function closeBookingDialog() {
-    showBooking = false;
-    const bookingDialog = document.querySelector('.booking-dialog');
-    if (bookingDialog) {
-        bookingDialog.remove();
+    } else {
+        const existingDialog = document.querySelector('.fixed.inset-0');
+        if (existingDialog) {
+            existingDialog.remove();
+        }
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     const userLang = navigator.language || navigator.userLanguage;
-    language = userLang.startsWith('ru') ? 'ru' : 'en';
+    state.language = userLang.startsWith('ru') ? 'ru' : 'en';
     renderQuiz();
 });
 
