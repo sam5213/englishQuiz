@@ -356,8 +356,13 @@ async function renderQuiz() {
     }
 
     if (showBooking) {
+        const existingDialog = document.querySelector('.booking-dialog');
+        if (existingDialog) {
+            existingDialog.remove();
+        }
+
         const bookingDialog = document.createElement('div');
-        bookingDialog.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center';
+        bookingDialog.className = 'booking-dialog fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center';
         bookingDialog.innerHTML = `
             <div class="bg-white p-8 rounded-lg max-w-md w-full">
                 <h2 class="text-2xl font-bold mb-4">
@@ -384,7 +389,7 @@ async function renderQuiz() {
                     </select>
                 </div>
                 <div class="flex justify-between">
-                    <button onclick="showBooking = false; renderQuiz();" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                    <button onclick="closeBookingDialog()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
                         ${language === 'en' ? "Cancel" : "Отмена"}
                     </button>
                     <button onclick="confirmBooking()" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded">
@@ -394,6 +399,14 @@ async function renderQuiz() {
             </div>
         `;
         document.body.appendChild(bookingDialog);
+    }
+}
+
+function closeBookingDialog() {
+    showBooking = false;
+    const bookingDialog = document.querySelector('.booking-dialog');
+    if (bookingDialog) {
+        bookingDialog.remove();
     }
 }
 
