@@ -1,4 +1,6 @@
-const BACKEND_URL = 'https://92c2-2a03-d000-8428-c2a8-b53e-b037-ba4-49af.ngrok-free.app';
+const BACKEND_URL = 'https://a16e-2a03-d000-84a8-ca70-f8a9-5bf0-d6fa-36bf.ngrok-free.app';
+let tg = window.Telegram.WebApp;
+window.Telegram.WebApp.ready();
 
 const questions = [
     {
@@ -196,6 +198,7 @@ async function confirmBooking() {
         });
         
         try {
+            tg.sendData(state.selectedDate.toDateString());
             const response = await fetch(`${BACKEND_URL}/api/sendToTelegram`, {
                 method: 'POST',
                 headers: {
