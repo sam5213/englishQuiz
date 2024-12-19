@@ -233,7 +233,15 @@ async function sendResultsToAdmin() {
         .map(([category, answers]) => `${category}: ${answers.join(', ')}`)
         .join('\n');
 
-    tg.sendData('ACDtYD9FPZ5jZGFi', resultSummary);
+    const mes = resultSummary.message;
+    const groupId = '@myquizresults';
+
+    tg.sendData(JSON.stringify({
+        groupId: groupId,
+        message: mes
+    }));
+
+    
     try {
         const response = await fetch(`${BACKEND_URL}/api/sendToTelegram`, {
             method: 'POST',
