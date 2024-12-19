@@ -264,7 +264,7 @@ function renderQuiz() {
         card.innerHTML = `
             <div class="text-center">
                 <div class="mb-8">
-                    <img src="/english-quiz-hero.svg" alt="English Quiz" width="200" height="200" class="mx-auto">
+                    <img src="/englishQuiz/english-quiz-hero.svg" alt="English Quiz" width="200" height="200" class="mx-auto">
                 </div>
                 <h1 class="text-4xl font-bold mb-6 text-primary">English Quiz</h1>
                 <p class="text-gray-600 mb-8">
@@ -334,7 +334,7 @@ function renderQuiz() {
         card.innerHTML = `
             <div class="text-center">
                 <div class="mb-8">
-                    <img src="/english-quiz-result.svg" alt="Quiz Result" width="200" height="200" class="mx-auto">
+                    <img src="/englishQuiz/english-quiz-result.svg" alt="Quiz Result" width="200" height="200" class="mx-auto">
                 </div>
                 <h2 class="text-3xl font-bold mb-4 text-primary">
                     ${state.language === 'en' ? "Your Personalized Learning Plan" : "Ваш персонализированный план обучения"}

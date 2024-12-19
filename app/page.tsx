@@ -260,7 +260,7 @@ export default function EnglishQuiz() {
             className="text-center"
           >
             <div className="mb-8">
-              <Image src="/english-quiz-hero.svg" alt="English Quiz" width={200} height={200} className="mx-auto" />
+              <Image src="/englishQuiz/english-quiz-hero.svg" alt="English Quiz" width={200} height={200} className="mx-auto" />
             </div>
             <h1 className="text-4xl font-bold mb-6 text-[#2196F3]">English Quiz</h1>
             <p className="text-gray-600 mb-8">
@@ -365,7 +365,7 @@ export default function EnglishQuiz() {
             className="text-center"
           >
             <div className="mb-8">
-              <Image src="/english-quiz-result.svg" alt="Quiz Result" width={200} height={200} className="mx-auto" />
+              <Image src="/englishQuiz/english-quiz-result.svg" alt="Quiz Result" width={200} height={200} className="mx-auto" />
             </div>
             <h2 className="text-3xl font-bold mb-4 text-[#2196F3]">
               {language === 'en' ? "Your Personalized Learning Plan" : "Ваш персонализированный план обучения"}
