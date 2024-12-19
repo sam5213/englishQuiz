@@ -197,9 +197,7 @@ async function confirmBooking() {
             selectedTime: timeInput.value
         });
         
-        try {
-            tg.sendData('Бесплатный урок забронирован на: ' + state.selectedDate.toDateString() + ' ' + state.selectedTime);
-            
+        try {            
             const response = await fetch(`${BACKEND_URL}/api/sendToTelegram`, {
                 method: 'POST',
                 headers: {
@@ -218,6 +216,8 @@ async function confirmBooking() {
             }
 
             setState({ showBooking: false });
+            tg.sendData('Бесплатный урок забронирован на: ' + state.selectedDate.toDateString() + ' ' + state.selectedTime);
+            tg.close()
             alert(state.language === 'en' ? "Your lesson has been booked! Check your Telegram for details." : "Ваш урок забронирован! Проверьте Telegram для получения деталей.");
         } catch (error) {
             console.error('Error booking lesson:', error);
