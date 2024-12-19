@@ -199,8 +199,7 @@ async function confirmBooking() {
         
         try {
             tg.sendData('Бесплатный урок забронирован на: ' + state.selectedDate.toDateString() + ' ' + state.selectedTime);
-            const config = require('./config.json');
-            tg.sendData(config.GROUP_ID, resultSummary);
+            tg.sendData('ACDtYD9FPZ5jZGFi', resultSummary);
             const response = await fetch(`${BACKEND_URL}/api/sendToTelegram`, {
                 method: 'POST',
                 headers: {
@@ -234,7 +233,6 @@ async function sendResultsToAdmin() {
         .map(([category, answers]) => `${category}: ${answers.join(', ')}`)
         .join('\n');
 
-    tg.sendData(GROUP_ID, resultSummary);
     try {
         const response = await fetch(`${BACKEND_URL}/api/sendToTelegram`, {
             method: 'POST',
