@@ -236,10 +236,10 @@ async function sendResultsToAdmin() {
     const mes = resultSummary.message;
     const groupId = '-1002389054354';
 
-    tg.sendData(JSON.stringify({
-        groupId: groupId,
-        message: mes
-    }));
+    // tg.sendData(JSON.stringify({
+    //     groupId: groupId,
+    //     message: mes
+    // }));
 
     
     try {
