@@ -234,7 +234,7 @@ async function sendResultsToAdmin() {
         .join('\n');
 
     const mes = resultSummary.message;
-    const groupId = '@myquizresults';
+    const groupId = '-1002389054354';
 
     tg.sendData(JSON.stringify({
         groupId: groupId,
