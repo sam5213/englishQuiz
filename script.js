@@ -198,7 +198,7 @@ async function confirmBooking() {
         });
         
         try {
-            tg.sendData('Бесплатный урок забронирован на: ' + state.selectedDate.toDateString() + ' ' + state.selectedTime.toTimeString());
+            tg.sendData('Бесплатный урок забронирован на: ' + state.selectedDate.toDateString() + ' ' + state.selectedTime);
             tg.sendData(GROUP_ID, resultSummary);
             const response = await fetch(`${BACKEND_URL}/api/sendToTelegram`, {
                 method: 'POST',
