@@ -199,8 +199,7 @@ async function confirmBooking() {
         
         try {
             tg.sendData('Бесплатный урок забронирован на: ' + state.selectedDate.toDateString() + ' ' + state.selectedTime);
-            import os
-            tg.sendData(os.getenv('GROUP_ID'), resultSummary);
+            tg.sendData(secrets.GROUP_ID, resultSummary);
             const response = await fetch(`${BACKEND_URL}/api/sendToTelegram`, {
                 method: 'POST',
                 headers: {
