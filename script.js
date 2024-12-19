@@ -198,17 +198,17 @@ async function confirmBooking() {
         });
         
         try {            
-            const response = await fetch(`${BACKEND_URL}/api/sendToTelegram`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify({
-                    type: 'booking',
-                    message: `New lesson booked for ${state.selectedDate.toDateString()} at ${state.selectedTime}`
-                }),
-            });
+            // const response = await fetch(`${BACKEND_URL}/api/sendToTelegram`, {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         'Accept': 'application/json',
+            //     },
+            //     body: JSON.stringify({
+            //         type: 'booking',
+            //         message: `New lesson booked for ${state.selectedDate.toDateString()} at ${state.selectedTime}`
+            //     }),
+            // });
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
