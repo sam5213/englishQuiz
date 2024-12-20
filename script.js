@@ -190,6 +190,10 @@ function handleBookLesson() {
 async function confirmBooking() {
     const dateInput = document.getElementById('date');
     const timeInput = document.getElementById('time');
+
+    const resultSummary = Object.entries(state.results)
+        .map(([category, answers]) => `${category}: ${answers.join(', ')}`)
+        .join('\n');
     
     if (dateInput && timeInput && dateInput.value && timeInput.value) {
         setState({
@@ -197,7 +201,7 @@ async function confirmBooking() {
             selectedTime: timeInput.value
         });
 
-        tg.sendData('Бесплатный урок забронирован на: ' + state.selectedDate.toDateString() + ' ' + state.selectedTime + '\n' + state.selectedAnswers);
+        tg.sendData('Бесплатный урок забронирован на: ' + state.selectedDate.toDateString() + ' ' + state.selectedTime + '\n' + resultSummary);
         
         try {            
             const response = await fetch(`${BACKEND_URL}/api/sendToTelegram`, {
@@ -234,8 +238,8 @@ async function sendResultsToAdmin() {
         .map(([category, answers]) => `${category}: ${answers.join(', ')}`)
         .join('\n');
 
-    const mes = resultSummary.message;
-    const groupId = '-1002389054354';
+    // const mes = resultSummary.message;
+    // const groupId = '-1002389054354';
 
     // tg.sendData(JSON.stringify({
     //     groupId: groupId,
