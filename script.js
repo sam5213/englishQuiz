@@ -378,9 +378,10 @@ function renderQuiz() {
         `;
     }
 
+    // Отображение попапа для бронирования
     if (state.showBooking) {
         const bookingDialog = document.createElement('div');
-        bookingDialog.className = 'fixed inset-0 bg-black bg-opacity-50 flex .items-center justify-center';
+        bookingDialog.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'; // Добавлен z-50 для отображения поверх
         bookingDialog.innerHTML = `
             <div class="bg-white p-8 rounded-lg max-w-md w-full">
                 <h2 class="text-2xl font-bold mb-4">
@@ -408,7 +409,7 @@ function renderQuiz() {
                 </div>
                 <div class="flex justify-between">
                     <button onclick="setState({ showBooking: false })" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
-                        ${state.language === 'en' ? "Cancel" : "Отмена"}
+                        ${state.language === 'en' ? "Cancel" : "От мена"}
                     </button>
                     <button onclick="confirmBooking()" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded">
                         ${state.language === 'en' ? "Confirm Booking" : "Подтвердить бронирование"}
