@@ -105,6 +105,16 @@ function handleAnswerSelect(answer) {
             [question.category]: updatedAnswers
         }
     });
+    
+    // Добавление класса для выделения выбранного ответа
+    const answerElements = document.querySelectorAll('.answer-option');
+    answerElements.forEach(element => {
+        if (currentAnswers.includes(element.dataset.answer)) {
+            element.classList.add('selected');
+        } else {
+            element.classList.remove('selected');
+        }
+    });
 }
 
 function handleNextQuestion() {
@@ -306,14 +316,11 @@ function renderQuiz() {
                     ${state.language === 'en' ? question.question : question.questionRu}
                 </h2>
                 <div class="grid grid-cols-2 gap-4">
-                    ${question.answers.map((answer, index) => `
+                    ${question.answers.map((answer) => `
                         <div 
                             onclick="handleAnswerSelect('${answer.en}')"
-                            class="cursor-pointer rounded-xl overflow-hidden shadow-md ${
-                                state.selectedAnswers[question.category]?.includes(answer.en)
-                                    ? 'ring-4 ring-primary'
-                                    :''
-                            }"
+                            class="cursor-pointer rounded-xl overflow-hidden shadow-md answer-option"
+                            data-answer="${answer.en}"
                         >
                             <div class="relative aspect-video">
                                 <img src="${answer.gif}" alt="${answer.en}" style="width: 100%; height: 100%; object-fit: cover;">
@@ -373,7 +380,7 @@ function renderQuiz() {
 
     if (state.showBooking) {
         const bookingDialog = document.createElement('div');
-        bookingDialog.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center';
+        bookingDialog.className = 'fixed inset-0 bg-black bg-opacity-50 flex .items-center justify-center';
         bookingDialog.innerHTML = `
             <div class="bg-white p-8 rounded-lg max-w-md w-full">
                 <h2 class="text-2xl font-bold mb-4">
