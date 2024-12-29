@@ -193,8 +193,61 @@ function analyzeResults() {
     return recommendation;
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const userLang = navigator.language || navigator.userLanguage;
+    state.language = userLang.startsWith('ru') ? 'ru' : 'en';
+    
+    // Создание попапа для бронирования
+    createBookingPopup();
+    renderQuiz();
+});
+
+function createBookingPopup() {
+    const bookingDialog = document.createElement('div');
+    bookingDialog.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden'; // Скрыт по умолчанию
+    bookingDialog.innerHTML = `
+        <div class="bg-white p-8 rounded-lg max-w-md w-full">
+            <h2 class="text-2xl font-bold mb-4">
+                ${state.language === 'en' ? "Book Your Free Lesson" : "Забронировать бесплатный урок"}
+            </h2>
+            <p class="mb-4">
+                ${state.language === 'en' ? "Choose a date and time for your free English lesson." : "Выберите дату и время для вашего бесплатного урока английского языка."}
+            </p>
+            <div class="mb-4">
+                <label for="date" class="block text-sm font-medium text-gray-700">
+                    ${state.language === 'en' ? "Date" : "Дата"}
+                </label>
+                <input type="date" id="date" name="date" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
+            </div>
+            <div class="mb-4">
+                <label for="time" class="block text-sm font-medium text-gray-700">
+                    ${state.language === 'en' ? "Time" : "Время"}
+                </label>
+                <select id="time" name="time" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
+                    <option value="09:00">09:00</option>
+                    <option value="11:00">11:00</option>
+                    <option value="14:00">14:00</option>
+                    <option value="16:00">16:00</option>
+                </select>
+            </div>
+            <div class="flex justify-between">
+                <button onclick="setState({ showBooking: false })" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                    ${state.language === 'en' ? "Cancel" : "Отмена"}
+                </button>
+                <button onclick="confirmBooking()" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded">
+                    ${state.language === 'en' ? "Confirm Booking" : "Подтвердить бронирование"}
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(bookingDialog);
+}
+
 function handleBookLesson() {
-    setState({ showBooking: true });
+    const bookingDialog = document.querySelector('.fixed.inset-0');
+    if (bookingDialog) {
+        bookingDialog.classList.remove('hidden'); // Показываем попап
+    }
 }
 
 async function confirmBooking() {
@@ -376,53 +429,6 @@ function renderQuiz() {
                 </button>
             </div>
         `;
-    }
-
-    // Отображение попапа для бронирования
-    if (state.showBooking) {
-        const bookingDialog = document.createElement('div');
-        bookingDialog.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'; // Добавлен z-50 для отображения поверх
-        bookingDialog.innerHTML = `
-            <div class="bg-white p-8 rounded-lg max-w-md w-full">
-                <h2 class="text-2xl font-bold mb-4">
-                    ${state.language === 'en' ? "Book Your Free Lesson" : "Забронировать бесплатный урок"}
-                </h2>
-                <p class="mb-4">
-                    ${state.language === 'en' ? "Choose a date and time for your free English lesson." : "Выберите дату и время для вашего бесплатного урока английского языка."}
-                </p>
-                <div class="mb-4">
-                    <label for="date" class="block text-sm font-medium text-gray-700">
-                        ${state.language === 'en' ? "Date" : "Дата"}
-                    </label>
-                    <input type="date" id="date" name="date" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
-                </div>
-                <div class="mb-4">
-                    <label for="time" class="block text-sm font-medium text-gray-700">
-                        ${state.language === 'en' ? "Time" : "Время"}
-                    </label>
-                    <select id="time" name="time" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
-                        <option value="09:00">09:00</option>
-                        <option value="11:00">11:00</option>
-                        <option value="14:00">14:00</option>
-                        <option value="16:00">16:00</option>
-                    </select>
-                </div>
-                <div class="flex justify-between">
-                    <button onclick="setState({ showBooking: false })" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
-                        ${state.language === 'en' ? "Cancel" : "От мена"}
-                    </button>
-                    <button onclick="confirmBooking()" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded">
-                        ${state.language === 'en' ? "Confirm Booking" : "Подтвердить бронирование"}
-                    </button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(bookingDialog);
-    } else {
-        const existingDialog = document.querySelector('.fixed.inset-0');
-        if (existingDialog) {
-            existingDialog.remove();
-        }
     }
 }
 
