@@ -232,3 +232,7 @@ button:disabled {
     display: none;
 }
 
+.selected-answer {
+    border: 2px solid var(--primary);
+    background-color: rgba(33, 150, 243, 0.1); /* Полупрозрачный фон для выделенного ответа */
+}
